@@ -16,7 +16,29 @@ class Pawn extends Piece
 
     moves(): Position[] {
         let positions: Position[] = [];
-        if (this.color === 'white') {
+        if (this.color === 'white') 
+            {
+                
+                let leftAttack = new Position(this.position.getX()-1, this.position.getY() - 1);
+                let piece = this.board.checkPosition(leftAttack);
+                if(piece)
+                {
+                    if(piece.color !== this.color)
+                    {
+                        positions.push(leftAttack);
+                    }
+                }
+
+                let rightAttack = new Position(this.position.getX()+1, this.position.getY() - 1);
+                piece = this.board.checkPosition(rightAttack);
+                if(piece)
+                {
+                    if(piece.color !== this.color)
+                    {
+                        positions.push(rightAttack);
+                    }
+                }
+            
             let oneStep = new Position(this.position.getX(), this.position.getY() - 1);
             if (this.board.checkPosition(oneStep) === null) {
                 positions.push(oneStep);
@@ -24,11 +46,37 @@ class Pawn extends Piece
     
             if (!this.moved) {
                 let twoSteps = new Position(this.position.getX(), this.position.getY() - 2);
-                if (this.board.checkPosition(twoSteps) === null) {
+                if (this.board.checkPosition(twoSteps) === null && this.board.checkPosition(oneStep)=== null) {
                     positions.push(twoSteps);
                 }
             }
-        } else {
+        } 
+        else 
+        {
+            let leftAttack = new Position(this.position.getX()+1, this.position.getY() + 1);
+            
+            let piece = this.board.checkPosition(leftAttack);
+            if(piece)
+            {
+                if(piece.color !== this.color)
+                {
+                    positions.push(leftAttack);
+                }
+            }
+             
+
+            let rightAttack: Position = new Position(this.position.getX()-1, this.position.getY() + 1);
+
+            piece = this.board.checkPosition(rightAttack);
+            if(piece)
+            {
+                if(piece.color !== this.color)
+                {
+                    positions.push(rightAttack);
+                }
+            }
+             
+
             let oneStep = new Position(this.position.getX(), this.position.getY() + 1);
             if (this.board.checkPosition(oneStep) === null) {
                 positions.push(oneStep);
@@ -36,9 +84,15 @@ class Pawn extends Piece
     
             if (!this.moved) {
                 let twoSteps = new Position(this.position.getX(), this.position.getY() + 2);
-                if (this.board.checkPosition(twoSteps) === null) {
+                if (this.board.checkPosition(twoSteps) === null && this.board.checkPosition(oneStep)=== null) {
                     positions.push(twoSteps);
                 }
+            }
+        }
+        for (let i = positions.length - 1; i >= 0; i--) {
+            let move = positions[i];
+            if (move.getX() > 7 || move.getX() < 0 || move.getY() > 7 || move.getY() < 0) {
+                positions.splice(i, 1);
             }
         }
         return positions;

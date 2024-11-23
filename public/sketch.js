@@ -18712,26 +18712,60 @@ class Pawn extends Piece_default {
   moves() {
     let positions = [];
     if (this.color === "white") {
+      let leftAttack = new Position_default(this.position.getX() - 1, this.position.getY() - 1);
+      let piece = this.board.checkPosition(leftAttack);
+      if (piece) {
+        if (piece.color !== this.color) {
+          positions.push(leftAttack);
+        }
+      }
+      let rightAttack = new Position_default(this.position.getX() + 1, this.position.getY() - 1);
+      piece = this.board.checkPosition(rightAttack);
+      if (piece) {
+        if (piece.color !== this.color) {
+          positions.push(rightAttack);
+        }
+      }
       let oneStep = new Position_default(this.position.getX(), this.position.getY() - 1);
       if (this.board.checkPosition(oneStep) === null) {
         positions.push(oneStep);
       }
       if (!this.moved) {
         let twoSteps = new Position_default(this.position.getX(), this.position.getY() - 2);
-        if (this.board.checkPosition(twoSteps) === null) {
+        if (this.board.checkPosition(twoSteps) === null && this.board.checkPosition(oneStep) === null) {
           positions.push(twoSteps);
         }
       }
     } else {
+      let leftAttack = new Position_default(this.position.getX() + 1, this.position.getY() + 1);
+      let piece = this.board.checkPosition(leftAttack);
+      if (piece) {
+        if (piece.color !== this.color) {
+          positions.push(leftAttack);
+        }
+      }
+      let rightAttack = new Position_default(this.position.getX() - 1, this.position.getY() + 1);
+      piece = this.board.checkPosition(rightAttack);
+      if (piece) {
+        if (piece.color !== this.color) {
+          positions.push(rightAttack);
+        }
+      }
       let oneStep = new Position_default(this.position.getX(), this.position.getY() + 1);
       if (this.board.checkPosition(oneStep) === null) {
         positions.push(oneStep);
       }
       if (!this.moved) {
         let twoSteps = new Position_default(this.position.getX(), this.position.getY() + 2);
-        if (this.board.checkPosition(twoSteps) === null) {
+        if (this.board.checkPosition(twoSteps) === null && this.board.checkPosition(oneStep) === null) {
           positions.push(twoSteps);
         }
+      }
+    }
+    for (let i = positions.length - 1;i >= 0; i--) {
+      let move = positions[i];
+      if (move.getX() > 7 || move.getX() < 0 || move.getY() > 7 || move.getY() < 0) {
+        positions.splice(i, 1);
       }
     }
     return positions;
@@ -18811,9 +18845,25 @@ class Board {
     const col = Math.floor((p.mouseX - 50) / 100);
     const row = Math.floor((p.mouseY - 50) / 100);
     if (col >= 0 && col < 8 && row >= 0 && row < 8) {
+      if (this.pressedPiece) {
+        let tempPosition = new Position_default(col, row);
+        const possibleMoves = this.pressedPiece.moves();
+        for (let move of possibleMoves) {
+          if (tempPosition.getX() === move.getX() && tempPosition.getY() === move.getY()) {
+            this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
+            this.pieces[tempPosition.getY()][tempPosition.getX()] = null;
+            this.pieces[tempPosition.getY()][tempPosition.getX()] = this.pressedPiece;
+            this.pressedPiece.setPosition(tempPosition);
+            if (this.pressedPiece instanceof Pawn_default) {
+              this.pressedPiece.moved = true;
+            }
+          }
+        }
+      }
       const piece = this.pieces[row][col];
       if (piece) {
         this.pressedPiece = piece;
+        console.log(this.pressedPiece.getPosition().getX() + " " + this.pressedPiece.getPosition().getY());
       } else {
         const pressedPosition = new Position_default(col, row);
         if (this.pressedPiece) {
