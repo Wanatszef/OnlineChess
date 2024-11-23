@@ -59,7 +59,6 @@ class Board
            }
         }
         if (this.pressedPiece) {
-            console.log(`Pressed piece: ${this.pressedPiece.color}`);
             const positions: Position[] = this.pressedPiece.moves();
             for (let i = 0; i < positions.length; i++) {
                 p.fill(0, 53, 255, 153);
@@ -74,48 +73,49 @@ class Board
 
     }
    
-    mousePressed(p: p5)
-    {
-        let col = Math.floor((p.mouseX - 50) / 100);
-        let row = Math.floor((p.mouseY - 50) / 100);
-            if (col >= 0 && col < 8 && row >= 0 && row < 8) 
-            {
-                const piece = this.pieces[row][col];
-                if (piece) 
-                {
-                    this.pressedPiece = piece;
-                } 
-                else 
-                {
-                    let pressedPosition: Position = new Position(row,col);
-                    console.log("pressedPosition X: " + pressedPosition.getX() + " Y: " + pressedPosition.getY());
-                    
-                    if(this.pressedPiece)
-                    {
-                        console.log("PiecePosition X: " + this.pressedPiece.getPosition().getX() + " Y: " + this.pressedPiece.getPosition().getY());
-                        const tempPositions: Position[] = this.pressedPiece.moves();
-                        for(let  i = 0; i < tempPositions.length; i++)
-                        {
-                           if(tempPositions[i].getX() === pressedPosition.getX() && tempPositions[i].getY() === pressedPosition.getY())
-                           {
-                            
-                           }
+    mousePressed(p: p5) {
+        const col = Math.floor((p.mouseX - 50) / 100); // Kolumna to X
+        const row = Math.floor((p.mouseY - 50) / 100); // Wiersz to Y
+    
+        if (col >= 0 && col < 8 && row >= 0 && row < 8) {   
+            const piece = this.pieces[row][col];
+            if (piece) {
+                this.pressedPiece = piece;
+            } else {
+                const pressedPosition = new Position(col, row);
+    
+                if (this.pressedPiece) {
+                    const possibleMoves = this.pressedPiece.moves();
+                    for (let move of possibleMoves) {
+                        if (move.getX() === pressedPosition.getX() && move.getY() === pressedPosition.getY()) {
+                            console.log("correct move");
+                            this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
+                            this.pieces[pressedPosition.getY()][pressedPosition.getX()] = this.pressedPiece;
+                            this.pressedPiece.setPosition(pressedPosition);
+                            if (this.pressedPiece instanceof Pawn) 
+                            {
+                                this.pressedPiece.moved = true;
+                            }
                         }
                     }
                 }
             }
+        }
+        p.redraw();
     }
+    
+    
 
-    public checkPosition(position: Position): Piece | null
-    {
-        const x = position.getX();
-        const y = position.getY();
-
-        if (x >= 0 && x < 8 && y >= 0 && y < 8) {
-        return this.pieces[y][x];
+    public checkPosition(position: Position): Piece | null {
+        const row = position.getY();
+        const col = position.getX();
+    
+        if (row >= 0 && row < 8 && col >= 0 && col < 8) {
+            return this.pieces[row][col];
         }
         return null;
     }
+    
 
     private initializePieces(): void 
     {

@@ -29,9 +29,9 @@ abstract class Piece
     return this.position;
    }
 
-   setPosition(position: Position): boolean
+   setPosition(position: Position): void
    {
-    return false;
+    this.position = position;
    }
 
 }

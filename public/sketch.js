@@ -18697,7 +18697,7 @@ class Piece {
     return this.position;
   }
   setPosition(position) {
-    return false;
+    this.position = position;
   }
 }
 var Piece_default = Piece;
@@ -18798,7 +18798,6 @@ class Board {
       }
     }
     if (this.pressedPiece) {
-      console.log(`Pressed piece: ${this.pressedPiece.color}`);
       const positions = this.pressedPiece.moves();
       for (let i = 0;i < positions.length; i++) {
         p.fill(0, 53, 255, 153);
@@ -18809,31 +18808,37 @@ class Board {
   update(p) {
   }
   mousePressed(p) {
-    let col = Math.floor((p.mouseX - 50) / 100);
-    let row = Math.floor((p.mouseY - 50) / 100);
+    const col = Math.floor((p.mouseX - 50) / 100);
+    const row = Math.floor((p.mouseY - 50) / 100);
     if (col >= 0 && col < 8 && row >= 0 && row < 8) {
       const piece = this.pieces[row][col];
       if (piece) {
         this.pressedPiece = piece;
       } else {
-        let pressedPosition = new Position_default(row, col);
-        console.log("pressedPosition X: " + pressedPosition.getX() + " Y: " + pressedPosition.getY());
+        const pressedPosition = new Position_default(col, row);
         if (this.pressedPiece) {
-          console.log("PiecePosition X: " + this.pressedPiece.getPosition().getX() + " Y: " + this.pressedPiece.getPosition().getY());
-          const tempPositions = this.pressedPiece.moves();
-          for (let i = 0;i < tempPositions.length; i++) {
-            if (tempPositions[i].getX() === pressedPosition.getX() && tempPositions[i].getY() === pressedPosition.getY()) {
+          const possibleMoves = this.pressedPiece.moves();
+          for (let move of possibleMoves) {
+            if (move.getX() === pressedPosition.getX() && move.getY() === pressedPosition.getY()) {
+              console.log("correct move");
+              this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
+              this.pieces[pressedPosition.getY()][pressedPosition.getX()] = this.pressedPiece;
+              this.pressedPiece.setPosition(pressedPosition);
+              if (this.pressedPiece instanceof Pawn_default) {
+                this.pressedPiece.moved = true;
+              }
             }
           }
         }
       }
     }
+    p.redraw();
   }
   checkPosition(position) {
-    const x = position.getX();
-    const y = position.getY();
-    if (x >= 0 && x < 8 && y >= 0 && y < 8) {
-      return this.pieces[y][x];
+    const row = position.getY();
+    const col = position.getX();
+    if (row >= 0 && row < 8 && col >= 0 && col < 8) {
+      return this.pieces[row][col];
     }
     return null;
   }
