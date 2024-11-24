@@ -21,7 +21,7 @@ class Rook extends Piece
         let upDir = true;
         let downDir = true;
     
-        for (let i = 1; i < 8; i++) { // i zaczyna się od 1, bo 0 to bieżąca pozycja
+        for (let i = 1; i < 8; i++) { 
             let right = new Position(this.getPosition().getX() + i, this.getPosition().getY());
             let left = new Position(this.getPosition().getX() - i, this.getPosition().getY());
             let up = new Position(this.getPosition().getX(), this.getPosition().getY() - i);
@@ -92,8 +92,10 @@ class Rook extends Piece
         }
         else
         {
-            p.fill(0);
+            p.stroke(240);
+            p.fill(4, 4, 4);
             p.text(this.icon,this.position.getX()*100+67, this.position.getY()*100+125);
+            p.stroke(12);
         }
      }
 

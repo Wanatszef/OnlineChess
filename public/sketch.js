@@ -18778,8 +18778,10 @@ class Pawn extends Piece_default {
       p.fill(255);
       p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
     } else {
-      p.fill(0);
+      p.stroke(240);
+      p.fill(4, 4, 4);
       p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
+      p.stroke(12);
     }
   }
   update(p) {
@@ -18861,8 +18863,10 @@ class Rook extends Piece_default {
       p.fill(255);
       p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
     } else {
-      p.fill(0);
+      p.stroke(240);
+      p.fill(4, 4, 4);
       p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
+      p.stroke(12);
     }
   }
   update(p) {
@@ -18871,9 +18875,340 @@ class Rook extends Piece_default {
 }
 var Rook_default = Rook;
 
+// src/gameComponents/Knight.ts
+class Knight extends Piece_default {
+  icon = "\u265E";
+  constructor(color2, board, position) {
+    super(color2, board, position);
+  }
+  moves() {
+    let positions = [];
+    const potentialMoves = [
+      [1, -2],
+      [2, -1],
+      [2, 1],
+      [1, 2],
+      [-1, 2],
+      [-2, 1],
+      [-2, -1],
+      [-1, -2]
+    ];
+    for (let move of potentialMoves) {
+      let newX = this.position.getX() + move[0];
+      let newY = this.position.getY() + move[1];
+      if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8) {
+        let newPosition = new Position_default(newX, newY);
+        let tempPiece = this.board.checkPosition(newPosition);
+        if (tempPiece) {
+          if (tempPiece.color !== this.color) {
+            positions.push(newPosition);
+          }
+        } else {
+          positions.push(newPosition);
+        }
+      }
+    }
+    return positions;
+  }
+  draw(p) {
+    p.textSize(80);
+    if (this.color === "white") {
+      p.strokeWeight(4);
+      p.stroke(12);
+      p.fill(255);
+      p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
+    } else {
+      p.stroke(240);
+      p.fill(4, 4, 4);
+      p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
+      p.stroke(12);
+    }
+  }
+  update(p) {
+    throw new Error("Method not implemented.");
+  }
+}
+var Knight_default = Knight;
+
+// src/gameComponents/Bishop.ts
+class Bishop extends Piece_default {
+  icon = "\u265D";
+  constructor(color2, board, position) {
+    super(color2, board, position);
+  }
+  moves() {
+    let positions = [];
+    let rightUpDir = true;
+    let leftUpDir = true;
+    let rightDownDir = true;
+    let leftDownDir = true;
+    for (let i = 1;i < 8; i++) {
+      let rightUp = new Position_default(this.getPosition().getX() + i, this.getPosition().getY() - i);
+      let leftUP = new Position_default(this.getPosition().getX() - i, this.getPosition().getY() - i);
+      let rightDown = new Position_default(this.getPosition().getX() + i, this.getPosition().getY() + i);
+      let leftDown = new Position_default(this.getPosition().getX() - i, this.getPosition().getY() + i);
+      if (rightUp.getX() < 8 && rightUp.getY() > 0 && rightUpDir) {
+        if (this.board.checkPosition(rightUp) === null) {
+          positions.push(rightUp);
+        } else {
+          let piece = this.board.checkPosition(rightUp);
+          if (piece && piece.color !== this.color) {
+            positions.push(rightUp);
+          }
+          rightUpDir = false;
+        }
+      }
+      if (leftUP.getX() >= 0 && leftUP.getY() >= 0 && leftUpDir) {
+        if (this.board.checkPosition(leftUP) === null) {
+          positions.push(leftUP);
+        } else {
+          let piece = this.board.checkPosition(leftUP);
+          if (piece && piece.color !== this.color) {
+            positions.push(leftUP);
+          }
+          leftUpDir = false;
+        }
+      }
+      if (rightDown.getY() < 8 && rightDown.getX() < 8 && rightDownDir) {
+        if (this.board.checkPosition(rightDown) === null) {
+          positions.push(rightDown);
+        } else {
+          let piece = this.board.checkPosition(rightDown);
+          if (piece && piece.color !== this.color) {
+            positions.push(rightDown);
+          }
+          rightDownDir = false;
+        }
+      }
+      if (leftDown.getY() < 8 && leftDown.getX() >= 0 && leftDownDir) {
+        if (this.board.checkPosition(leftDown) === null) {
+          positions.push(leftDown);
+        } else {
+          let piece = this.board.checkPosition(leftDown);
+          if (piece && piece.color !== this.color) {
+            positions.push(leftDown);
+          }
+          leftDownDir = false;
+        }
+      }
+    }
+    return positions;
+  }
+  draw(p) {
+    p.textSize(80);
+    if (this.color === "white") {
+      p.strokeWeight(4);
+      p.stroke(12);
+      p.fill(255);
+      p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
+    } else {
+      p.stroke(240);
+      p.fill(4, 4, 4);
+      p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
+      p.stroke(12);
+    }
+  }
+  update(p) {
+    throw new Error("Method not implemented.");
+  }
+}
+var Bishop_default = Bishop;
+
+// src/gameComponents/Queen.ts
+class Queen extends Piece_default {
+  icon = "\u265B";
+  constructor(color2, board, position) {
+    super(color2, board, position);
+  }
+  moves() {
+    let positions = [];
+    let rightUpDir = true;
+    let leftUpDir = true;
+    let rightDownDir = true;
+    let leftDownDir = true;
+    let rightDir = true;
+    let leftDir = true;
+    let upDir = true;
+    let downDir = true;
+    for (let i = 1;i < 8; i++) {
+      let rightUp = new Position_default(this.getPosition().getX() + i, this.getPosition().getY() - i);
+      let leftUP = new Position_default(this.getPosition().getX() - i, this.getPosition().getY() - i);
+      let rightDown = new Position_default(this.getPosition().getX() + i, this.getPosition().getY() + i);
+      let leftDown = new Position_default(this.getPosition().getX() - i, this.getPosition().getY() + i);
+      let right = new Position_default(this.getPosition().getX() + i, this.getPosition().getY());
+      let left = new Position_default(this.getPosition().getX() - i, this.getPosition().getY());
+      let up = new Position_default(this.getPosition().getX(), this.getPosition().getY() - i);
+      let down = new Position_default(this.getPosition().getX(), this.getPosition().getY() + i);
+      if (rightUp.getX() < 8 && rightUp.getY() > 0 && rightUpDir) {
+        if (this.board.checkPosition(rightUp) === null) {
+          positions.push(rightUp);
+        } else {
+          let piece = this.board.checkPosition(rightUp);
+          if (piece && piece.color !== this.color) {
+            positions.push(rightUp);
+          }
+          rightUpDir = false;
+        }
+      }
+      if (leftUP.getX() >= 0 && leftUP.getY() >= 0 && leftUpDir) {
+        if (this.board.checkPosition(leftUP) === null) {
+          positions.push(leftUP);
+        } else {
+          let piece = this.board.checkPosition(leftUP);
+          if (piece && piece.color !== this.color) {
+            positions.push(leftUP);
+          }
+          leftUpDir = false;
+        }
+      }
+      if (rightDown.getY() < 8 && rightDown.getX() < 8 && rightDownDir) {
+        if (this.board.checkPosition(rightDown) === null) {
+          positions.push(rightDown);
+        } else {
+          let piece = this.board.checkPosition(rightDown);
+          if (piece && piece.color !== this.color) {
+            positions.push(rightDown);
+          }
+          rightDownDir = false;
+        }
+      }
+      if (leftDown.getY() < 8 && leftDown.getX() >= 0 && leftDownDir) {
+        if (this.board.checkPosition(leftDown) === null) {
+          positions.push(leftDown);
+        } else {
+          let piece = this.board.checkPosition(leftDown);
+          if (piece && piece.color !== this.color) {
+            positions.push(leftDown);
+          }
+          leftDownDir = false;
+        }
+      }
+      if (right.getX() < 8 && rightDir) {
+        if (this.board.checkPosition(right) === null) {
+          positions.push(right);
+        } else {
+          let piece = this.board.checkPosition(right);
+          if (piece && piece.color !== this.color) {
+            positions.push(right);
+          }
+          rightDir = false;
+        }
+      }
+      if (left.getX() >= 0 && leftDir) {
+        if (this.board.checkPosition(left) === null) {
+          positions.push(left);
+        } else {
+          let piece = this.board.checkPosition(left);
+          if (piece && piece.color !== this.color) {
+            positions.push(left);
+          }
+          leftDir = false;
+        }
+      }
+      if (up.getY() >= 0 && upDir) {
+        if (this.board.checkPosition(up) === null) {
+          positions.push(up);
+        } else {
+          let piece = this.board.checkPosition(up);
+          if (piece && piece.color !== this.color) {
+            positions.push(up);
+          }
+          upDir = false;
+        }
+      }
+      if (down.getY() < 8 && downDir) {
+        if (this.board.checkPosition(down) === null) {
+          positions.push(down);
+        } else {
+          let piece = this.board.checkPosition(down);
+          if (piece && piece.color !== this.color) {
+            positions.push(down);
+          }
+          downDir = false;
+        }
+      }
+    }
+    return positions;
+  }
+  draw(p) {
+    p.textSize(80);
+    if (this.color === "white") {
+      p.strokeWeight(4);
+      p.stroke(12);
+      p.fill(255);
+      p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
+    } else {
+      p.stroke(240);
+      p.fill(4, 4, 4);
+      p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
+      p.stroke(12);
+    }
+  }
+  update(p) {
+    throw new Error("Method not implemented.");
+  }
+}
+var Queen_default = Queen;
+
+// src/gameComponents/King.ts
+class King extends Piece_default {
+  icon = "\u265A";
+  constructor(color2, board, position) {
+    super(color2, board, position);
+  }
+  moves() {
+    let positions = [];
+    const potentialMoves = [
+      [1, 0],
+      [0, 1],
+      [-1, 0],
+      [0, -1],
+      [1, 1],
+      [-1, -1],
+      [1, -1],
+      [-1, 1]
+    ];
+    for (let move of potentialMoves) {
+      let x = this.position.getX() + move[0];
+      let y = this.position.getY() + move[1];
+      if (x >= 0 && x < 8 && y >= 0 && y < 8) {
+        let newPosition = new Position_default(x, y);
+        let tempPiece = this.board.checkPosition(newPosition);
+        if (tempPiece) {
+          if (tempPiece.color !== this.color) {
+            positions.push(newPosition);
+          }
+        } else {
+          positions.push(newPosition);
+        }
+      }
+    }
+    return positions;
+  }
+  draw(p) {
+    p.textSize(80);
+    if (this.color === "white") {
+      p.strokeWeight(4);
+      p.stroke(12);
+      p.fill(255);
+      p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
+    } else {
+      p.stroke(240);
+      p.fill(4, 4, 4);
+      p.text(this.icon, this.position.getX() * 100 + 67, this.position.getY() * 100 + 125);
+      p.stroke(12);
+    }
+  }
+  update(p) {
+    throw new Error("Method not implemented.");
+  }
+}
+var King_default = King;
+
 // src/gameComponents/Board.ts
 class Board {
   pieces;
+  turn = "white";
   pressedPiece = null;
   draw(p, tileSize) {
     for (let i = 0;i < 8; i++) {
@@ -18928,7 +19263,7 @@ class Board {
     const col = Math.floor((p.mouseX - 50) / 100);
     const row = Math.floor((p.mouseY - 50) / 100);
     if (col >= 0 && col < 8 && row >= 0 && row < 8) {
-      if (this.pressedPiece) {
+      if (this.pressedPiece && this.pressedPiece.color === this.turn) {
         let tempPosition = new Position_default(col, row);
         const possibleMoves = this.pressedPiece.moves();
         for (let move of possibleMoves) {
@@ -18940,6 +19275,8 @@ class Board {
             if (this.pressedPiece instanceof Pawn_default || this.pressedPiece instanceof Rook_default) {
               this.pressedPiece.moved = true;
             }
+            this.pressedPiece = null;
+            break;
           }
         }
       }
@@ -18949,7 +19286,7 @@ class Board {
         console.log(this.pressedPiece.getPosition().getX() + " " + this.pressedPiece.getPosition().getY());
       } else {
         const pressedPosition = new Position_default(col, row);
-        if (this.pressedPiece) {
+        if (this.pressedPiece && this.pressedPiece.color == this.turn) {
           const possibleMoves = this.pressedPiece.moves();
           for (let move of possibleMoves) {
             if (move.getX() === pressedPosition.getX() && move.getY() === pressedPosition.getY()) {
@@ -18957,9 +19294,10 @@ class Board {
               this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
               this.pieces[pressedPosition.getY()][pressedPosition.getX()] = this.pressedPiece;
               this.pressedPiece.setPosition(pressedPosition);
-              if (this.pressedPiece instanceof Pawn_default) {
+              if (this.pressedPiece instanceof Pawn_default || this.pressedPiece instanceof Rook_default) {
                 this.pressedPiece.moved = true;
               }
+              this.pressedPiece = null;
               break;
             }
           }
@@ -18986,6 +19324,18 @@ class Board {
     this.pieces[0][7] = new Rook_default("black", this, new Position_default(7, 0));
     this.pieces[7][0] = new Rook_default("white", this, new Position_default(0, 7));
     this.pieces[7][7] = new Rook_default("white", this, new Position_default(7, 7));
+    this.pieces[7][1] = new Knight_default("white", this, new Position_default(1, 7));
+    this.pieces[7][6] = new Knight_default("white", this, new Position_default(6, 7));
+    this.pieces[0][1] = new Knight_default("black", this, new Position_default(1, 0));
+    this.pieces[0][6] = new Knight_default("black", this, new Position_default(6, 0));
+    this.pieces[7][2] = new Bishop_default("white", this, new Position_default(2, 7));
+    this.pieces[7][5] = new Bishop_default("white", this, new Position_default(5, 7));
+    this.pieces[0][2] = new Bishop_default("black", this, new Position_default(2, 0));
+    this.pieces[0][5] = new Bishop_default("black", this, new Position_default(5, 0));
+    this.pieces[0][3] = new Queen_default("black", this, new Position_default(3, 0));
+    this.pieces[7][3] = new Queen_default("white", this, new Position_default(3, 7));
+    this.pieces[0][4] = new King_default("black", this, new Position_default(4, 0));
+    this.pieces[7][4] = new King_default("white", this, new Position_default(4, 7));
   }
   constructor(pieces) {
     this.pieces = Array.from({ length: 8 }, () => Array(8).fill(null));

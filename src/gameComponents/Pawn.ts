@@ -109,9 +109,11 @@ class Pawn extends Piece
             p.text(this.icon,this.position.getX()*100+67, this.position.getY()*100+125);
         }
         else
-        {
-            p.fill(0);
+        {   
+            p.stroke(240);
+            p.fill(4, 4, 4);
             p.text(this.icon,this.position.getX()*100+67, this.position.getY()*100+125);
+            p.stroke(12);
         }
 
     }

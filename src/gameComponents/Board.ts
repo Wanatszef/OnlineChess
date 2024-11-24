@@ -3,10 +3,16 @@ import p5 from 'p5';
 import Position from "./Position";
 import Pawn from "./Pawn";
 import Rook from "./Rook";
+import Knight from "./Knight";
+import Bishop from "./Bishop";
+import Queen from "./Queen";
+import King from "./King";
 
 class Board
 {
     pieces: (Piece | null)[][];
+
+    turn: string = 'white';
 
     pressedPiece: (Piece|null) = null;
 
@@ -79,7 +85,7 @@ class Board
         const row = Math.floor((p.mouseY - 50) / 100); 
     
         if (col >= 0 && col < 8 && row >= 0 && row < 8) {
-            if(this.pressedPiece)
+            if(this.pressedPiece && this.pressedPiece.color === this.turn)
             {
                 let tempPosition: Position = new Position(col, row);
                 const possibleMoves = this.pressedPiece.moves();
@@ -95,6 +101,9 @@ class Board
                             {
                                 this.pressedPiece.moved = true;
                             }
+                        this.pressedPiece = null;
+                        break;
+                        
                     }
                 }
             }
@@ -105,20 +114,21 @@ class Board
             } else {
                 const pressedPosition = new Position(col, row);
     
-                if (this.pressedPiece) {
+                if (this.pressedPiece && this.pressedPiece.color == this.turn) {
                     const possibleMoves = this.pressedPiece.moves();
                     for (let move of possibleMoves) 
-                        {
+                    {
                         if (move.getX() === pressedPosition.getX() && move.getY() === pressedPosition.getY()) 
                         {
                             console.log("correct move");
                             this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
                             this.pieces[pressedPosition.getY()][pressedPosition.getX()] = this.pressedPiece;
                             this.pressedPiece.setPosition(pressedPosition);
-                            if (this.pressedPiece instanceof Pawn) 
+                            if (this.pressedPiece instanceof Pawn || this.pressedPiece instanceof Rook) 
                             {
                                 this.pressedPiece.moved = true;
                             }
+                            this.pressedPiece = null;
                             break;
                         }
                     }
@@ -155,6 +165,28 @@ class Board
 
         this.pieces[7][0] = new Rook('white',this, new Position(0,7));
         this.pieces[7][7] = new Rook('white',this, new Position(7,7));
+
+        this.pieces[7][1] = new Knight('white',this, new Position(1,7));
+        this.pieces[7][6] = new Knight('white',this, new Position(6,7));
+
+        this.pieces[0][1] = new Knight('black',this, new Position(1,0));
+        this.pieces[0][6] = new Knight('black',this, new Position(6,0));
+
+        this.pieces[7][2] = new Bishop('white',this, new Position(2,7));
+        this.pieces[7][5] = new Bishop('white',this, new Position(5,7));
+
+        this.pieces[0][2] = new Bishop('black',this, new Position(2,0));
+        this.pieces[0][5] = new Bishop('black',this, new Position(5,0));
+
+        this.pieces[0][3] = new Queen('black',this, new Position(3,0));
+
+        this.pieces[7][3] = new Queen('white',this, new Position(3,7));
+
+        this.pieces[0][4] = new King('black',this, new Position(4,0));
+
+        this.pieces[7][4] = new King('white',this, new Position(4,7));
+
+
     }
     
 
