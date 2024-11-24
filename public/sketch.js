@@ -19263,45 +19263,31 @@ class Board {
     const col = Math.floor((p.mouseX - 50) / 100);
     const row = Math.floor((p.mouseY - 50) / 100);
     if (col >= 0 && col < 8 && row >= 0 && row < 8) {
-      if (this.pressedPiece && this.pressedPiece.color === this.turn) {
+      if (this.pressedPiece) {
         let tempPosition = new Position_default(col, row);
         const possibleMoves = this.pressedPiece.moves();
         for (let move of possibleMoves) {
           if (tempPosition.getX() === move.getX() && tempPosition.getY() === move.getY()) {
             this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
-            this.pieces[tempPosition.getY()][tempPosition.getX()] = null;
             this.pieces[tempPosition.getY()][tempPosition.getX()] = this.pressedPiece;
             this.pressedPiece.setPosition(tempPosition);
             if (this.pressedPiece instanceof Pawn_default || this.pressedPiece instanceof Rook_default) {
               this.pressedPiece.moved = true;
             }
+            this.turn = this.turn === "white" ? "black" : "white";
             this.pressedPiece = null;
-            break;
+            return;
           }
         }
-      }
-      const piece = this.pieces[row][col];
-      if (piece) {
-        this.pressedPiece = piece;
-        console.log(this.pressedPiece.getPosition().getX() + " " + this.pressedPiece.getPosition().getY());
+        this.pressedPiece = null;
       } else {
-        const pressedPosition = new Position_default(col, row);
-        if (this.pressedPiece && this.pressedPiece.color == this.turn) {
-          const possibleMoves = this.pressedPiece.moves();
-          for (let move of possibleMoves) {
-            if (move.getX() === pressedPosition.getX() && move.getY() === pressedPosition.getY()) {
-              console.log("correct move");
-              this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
-              this.pieces[pressedPosition.getY()][pressedPosition.getX()] = this.pressedPiece;
-              this.pressedPiece.setPosition(pressedPosition);
-              if (this.pressedPiece instanceof Pawn_default || this.pressedPiece instanceof Rook_default) {
-                this.pressedPiece.moved = true;
-              }
-              this.pressedPiece = null;
-              break;
-            }
+        const piece = this.pieces[row][col];
+        if (piece) {
+          if (piece.color === this.turn) {
+            this.pressedPiece = piece;
+          } else {
+            console.log("Nie Twoja tura!");
           }
-          this.pressedPiece = null;
         }
       }
     }
