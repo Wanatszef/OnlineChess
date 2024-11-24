@@ -2,6 +2,7 @@ import Piece from "./Piece"
 import p5 from 'p5';
 import Position from "./Position";
 import Pawn from "./Pawn";
+import Rook from "./Rook";
 
 class Board
 {
@@ -90,7 +91,7 @@ class Board
                         this.pieces[tempPosition.getY()][tempPosition.getX()] = null;
                         this.pieces[tempPosition.getY()][tempPosition.getX()] = this.pressedPiece;
                         this.pressedPiece.setPosition(tempPosition);
-                        if (this.pressedPiece instanceof Pawn) 
+                        if (this.pressedPiece instanceof Pawn || this.pressedPiece instanceof Rook) 
                             {
                                 this.pressedPiece.moved = true;
                             }
@@ -118,8 +119,10 @@ class Board
                             {
                                 this.pressedPiece.moved = true;
                             }
+                            break;
                         }
                     }
+                    this.pressedPiece = null;
                 }
             }
         }
@@ -146,6 +149,12 @@ class Board
             this.pieces[1][i] = new Pawn('black', this, new Position(i, 1)); 
             this.pieces[6][i] = new Pawn('white', this, new Position(i, 6)); 
         }
+
+        this.pieces[0][0] = new Rook('black',this, new Position(0,0));
+        this.pieces[0][7] = new Rook('black',this, new Position(7,0));
+
+        this.pieces[7][0] = new Rook('white',this, new Position(0,7));
+        this.pieces[7][7] = new Rook('white',this, new Position(7,7));
     }
     
 
