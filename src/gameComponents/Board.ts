@@ -92,18 +92,30 @@ class Board
                 for (let move of possibleMoves) {
                     if (tempPosition.getX() === move.getX() && tempPosition.getY() === move.getY()) 
                         {
-                        this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
-                        this.pieces[tempPosition.getY()][tempPosition.getX()] = this.pressedPiece;
-                        this.pressedPiece.setPosition(tempPosition);
-    
-                        if (this.pressedPiece instanceof Pawn || this.pressedPiece instanceof Rook) 
+                        let tempBoard : (Piece | null)[][] = this.pieces;
+                        tempBoard[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
+                        tempBoard[tempPosition.getY()][tempPosition.getX()] = this.pressedPiece;
+                        
+                        if(this.isKingOnTarget(tempBoard))
                         {
-                            this.pressedPiece.moved = true;
+                            return;
                         }
-    
-                        this.turn = this.turn === 'white' ? 'black' : 'white';
-                        this.pressedPiece = null;
-                        return;
+                        else
+                        {
+
+                            this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
+                            this.pieces[tempPosition.getY()][tempPosition.getX()] = this.pressedPiece;
+                            this.pressedPiece.setPosition(tempPosition);
+        
+                            if (this.pressedPiece instanceof Pawn || this.pressedPiece instanceof Rook || this.pressedPiece instanceof King) 
+                            {
+                                this.pressedPiece.moved = true;
+                            }
+        
+                            this.turn = this.turn === 'white' ? 'black' : 'white';
+                            this.pressedPiece = null;
+                            return;
+                        }
                     }
                 }
                 this.pressedPiece = null;
@@ -177,6 +189,48 @@ class Board
 
     }
     
+    private isKingOnTarget(tempBoard: (Piece | null)[][]): Boolean
+    {
+        const kingColor: String = this.turn;
+        let king = null;
+
+        for(let i: number = 0; i<8; i++)
+            {
+               for(let j: number = 0; j<8; j++)
+               {
+                let tempPiece = tempBoard[i][j];
+                if(tempPiece instanceof King && tempPiece.color === kingColor)
+                {
+                    king = tempPiece;
+                }
+
+               }
+            }
+
+        if(king !== null)
+        {
+            for(let i: number = 0; i<8; i++)
+                {
+                for(let j: number = 0; j<8; j++)
+                {
+                    let tempPiece = tempBoard[i][j];
+
+                    if(tempPiece && tempPiece.color != kingColor && king !== null)
+                    {
+                        for(let z: number = 0; z<tempPiece.moves().length; z++)
+                        {
+                            if(tempPiece.moves()[z].getX() === king.getPosition().getX() && tempPiece.moves()[z].getY() === king.getPosition().getY())
+                            {
+                                console.log("król jest na celowniku");
+                                return true;
+                            }
+                        }
+                    }
+                }
+                }
+        }
+        return false;
+    }
 
     constructor(pieces: Piece[][])
     {

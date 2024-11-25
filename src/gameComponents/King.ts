@@ -5,6 +5,7 @@ import Position from "./Position";
 class King extends Piece
 {
     icon: string = '♚';
+    moved: boolean = false;
 
     constructor(color: string, board: Board, position: Position)
    {
