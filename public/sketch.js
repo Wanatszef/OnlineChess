@@ -19269,18 +19269,25 @@ class Board {
         const possibleMoves = this.pressedPiece.moves();
         for (let move of possibleMoves) {
           if (tempPosition.getX() === move.getX() && tempPosition.getY() === move.getY()) {
-            let tempBoard = this.pieces;
-            tempBoard[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
-            tempBoard[tempPosition.getY()][tempPosition.getX()] = this.pressedPiece;
-            if (this.isKingOnTarget(tempBoard)) {
-              return;
-            } else {
-              this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
-              this.pieces[tempPosition.getY()][tempPosition.getX()] = this.pressedPiece;
-              this.pressedPiece.setPosition(tempPosition);
-              if (this.pressedPiece instanceof Pawn_default || this.pressedPiece instanceof Rook_default || this.pressedPiece instanceof King_default) {
-                this.pressedPiece.moved = true;
+            const intialPosition = this.pressedPiece.getPosition();
+            const tempPositionPiece = this.pieces[tempPosition.getY()][tempPosition.getX()];
+            this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
+            this.pieces[tempPosition.getY()][tempPosition.getX()] = this.pressedPiece;
+            this.pressedPiece.setPosition(tempPosition);
+            if (this.pressedPiece instanceof Pawn_default || this.pressedPiece instanceof Rook_default || this.pressedPiece instanceof King_default) {
+              this.pressedPiece.moved = true;
+            }
+            if (this.isKingOnTarget() === true) {
+              console.log("kr\xF3l na celowniku");
+              this.pieces[intialPosition.getY()][intialPosition.getX()] = this.pressedPiece;
+              this.pressedPiece.setPosition(intialPosition);
+              if (tempPositionPiece) {
+                this.pieces[tempPosition.getY()][tempPosition.getX()] = tempPositionPiece;
+                break;
+              } else {
+                this.pieces[tempPosition.getY()][tempPosition.getX()] = null;
               }
+            } else {
               this.turn = this.turn === "white" ? "black" : "white";
               this.pressedPiece = null;
               return;
@@ -19331,12 +19338,15 @@ class Board {
     this.pieces[0][4] = new King_default("black", this, new Position_default(4, 0));
     this.pieces[7][4] = new King_default("white", this, new Position_default(4, 7));
   }
-  isKingOnTarget(tempBoard) {
+  copyBoard(board) {
+    return board.map((row) => row.map((piece) => piece ? Object.assign(Object.create(Object.getPrototypeOf(piece)), piece) : null));
+  }
+  isKingOnTarget() {
     const kingColor = this.turn;
     let king = null;
     for (let i = 0;i < 8; i++) {
       for (let j = 0;j < 8; j++) {
-        let tempPiece = tempBoard[i][j];
+        let tempPiece = this.pieces[i][j];
         if (tempPiece instanceof King_default && tempPiece.color === kingColor) {
           king = tempPiece;
         }
@@ -19345,11 +19355,10 @@ class Board {
     if (king !== null) {
       for (let i = 0;i < 8; i++) {
         for (let j = 0;j < 8; j++) {
-          let tempPiece = tempBoard[i][j];
+          let tempPiece = this.pieces[i][j];
           if (tempPiece && tempPiece.color != kingColor && king !== null) {
             for (let z = 0;z < tempPiece.moves().length; z++) {
               if (tempPiece.moves()[z].getX() === king.getPosition().getX() && tempPiece.moves()[z].getY() === king.getPosition().getY()) {
-                console.log("kr\xF3l jest na celowniku");
                 return true;
               }
             }
