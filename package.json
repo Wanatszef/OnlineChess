@@ -12,8 +12,10 @@
   },
   "module": "src/index.js",
 
-  "scripts": {
-  "build": "bun bun public/sketch.ts > public/sketch.js",
+"scripts": {
+  "build:sketch": "bun bun public/sketch.ts > public/sketch.js",
+  "build:aiGame": "bun bun public/aiGame.ts > public/aiGame.js",
+  "build": "bun run build:sketch && bun run build:aiGame",
   "start": "bun run src/server.ts"
 }
 

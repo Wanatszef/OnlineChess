@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
+<style>
+
+body
+{
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #343541; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ececec; 
+}
+
+
+.container
+{
+    display: flex;
+    flex-direction: row;
+    gap: 20px; 
+}
+
+
+.menu-button
+{
+    width: 180px;
+    height: 60px;
+    border: 1px solid #4f525c; 
+    border-radius: 8px; 
+    background-color: #40414f; 
+    color: #ececec; 
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.menu-button:hover
+{
+    background-color: #565869;
+    border-color: #6e717e;
+    transform: translateY(-2px); 
+}
+
+.menu-button:active
+{
+    background-color: #3a3b47;
+    transform: translateY(2px);
+    box-shadow: none; 
+}
+
+</style>
+
+
+</head>
+<body>
+    <div class="container">
+        <a href="local">
+        <button class="menu-button">Local Game</button>
+        </a>
+        <a href="computerGame">
+        <button class="menu-button">Play V AI</button>
+        </a>
+        <button class="menu-button">Play Online</button>
+    </div>
+</body>
+</html>

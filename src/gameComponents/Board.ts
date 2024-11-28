@@ -161,8 +161,7 @@ class Board
         return null;
     }
     
-
-    private initializePieces(): void 
+    public initializePieces(): void 
     {
         for (let i = 0; i < 8; i++) 
         {
