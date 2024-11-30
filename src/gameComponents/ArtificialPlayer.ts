@@ -15,25 +15,31 @@ class ArtificialPlayer
 
     board: Board;
 
+    whiteScore: number;
+
+    blackScore: number;
+
+    pieceValues: Record<string, number> = {
+        'P': 10,  // pionek biały
+        'p': -10,  // pionek czarny
+        'N': 30,  // skoczek biały
+        'n': -30,  // skoczek czarny
+        'B': 30,  // goniec biały
+        'b': -30,  // goniec czarny
+        'R': 50,  // wieża biała
+        'r': -50,  // wieża czarna
+        'Q': 90,  // hetman biały
+        'q': -90,  // hetman czarny
+        'K': 0,  // król biały
+        'k': 0   // król czarny
+    };
     constructor(color: string, board: Board)
     {
+        this.whiteScore =0;
+        this.blackScore =0;
         this.color = color;
         this.board = board;
     }
-    /*
-        const blackPawn: String = 'p';
-        const blackBishop: String = 'b';
-        const blackKing: String = 'k';
-        const blackKnight: String = 'n';
-        const blackQueen: String = 'q';
-        const blackRock: String = 'r';
-        const whitePawn: String = 'P';
-        const whiteBishop: String = 'B'
-        const whiteKing: String = 'K';
-        const whiteKnight: String = 'N';
-        const whiteQueen: String =  'Q';
-        const whiteRock: String = 'R';
-        */
 
         public piecesArrayToFEN(pieces: (Piece | null)[][]): string {
             let output: string = '';
@@ -105,10 +111,31 @@ class ArtificialPlayer
                     }
                 }
             }
-
             return pieces;
-            
         }
+
+        public getScore(fENArray: String) :Number
+        {
+            let score: number = 0;
+            
+            for(const char of fENArray)
+            {
+                if(this.pieceValues[char])
+                {
+                    score+= this.pieceValues[char];
+                }
+            }
+
+            return score;
+        }
+
+        public minmax(pieces: (Piece | null)[][]): number
+        {
+            
+            return 0;
+        }
+
+
         
 
     

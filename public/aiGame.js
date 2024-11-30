@@ -19379,7 +19379,25 @@ var Board_default = Board;
 class ArtificialPlayer {
   color;
   board;
+  whiteScore;
+  blackScore;
+  pieceValues = {
+    P: 10,
+    p: -10,
+    N: 30,
+    n: -30,
+    B: 30,
+    b: -30,
+    R: 50,
+    r: -50,
+    Q: 90,
+    q: -90,
+    K: 0,
+    k: 0
+  };
   constructor(color2, board) {
+    this.whiteScore = 0;
+    this.blackScore = 0;
     this.color = color2;
     this.board = board;
   }
@@ -19452,6 +19470,15 @@ class ArtificialPlayer {
       }
     return pieces;
   }
+  getScore(fENArray) {
+    let score = 0;
+    for (const char of fENArray) {
+      if (this.pieceValues[char]) {
+        score += this.pieceValues[char];
+      }
+    }
+    return score;
+  }
 }
 var ArtificialPlayer_default = ArtificialPlayer;
 
@@ -19519,6 +19546,7 @@ class AIBoard extends Board_default {
       }
     }
     p.redraw();
+    console.log("Score: " + this.artificialPlayer.getScore(this.artificialPlayer.piecesArrayToFEN(this.pieces)));
   }
 }
 var AIBoard_default = AIBoard;

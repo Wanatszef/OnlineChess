@@ -39,6 +39,7 @@ class AIBoard extends Board
 
 
     mousePressed(p: p5) {
+        
         const col = Math.floor((p.mouseX - 50) / 100); 
         const row = Math.floor((p.mouseY - 50) / 100); 
     
@@ -104,7 +105,9 @@ class AIBoard extends Board
                 }
             }
         }
+        
         p.redraw();
+        console.log("Score: " + this.artificialPlayer.getScore(this.artificialPlayer.piecesArrayToFEN(this.pieces)));
     }
 }
 
