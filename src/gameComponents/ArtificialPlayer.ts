@@ -92,29 +92,9 @@ class ArtificialPlayer
         Position(kolumna,rząd);
         board[rzad][kolumna];
         */
-        public move(pieces: (Piece | null)[][]) : (Piece | null)[][]
-        {
-            outerLoop: while(true)
-            {
-                let tempPiece = pieces[Math.floor(Math.random() * 8)][Math.floor(Math.random() * 8)];
-                if(tempPiece && tempPiece.color === this.color)
-                {
-                    let positions: Position[] = tempPiece.moves();
-                    if(positions.length > 0)
-                    {
-                        let randomPostion: Position = positions[Math.floor(Math.random() * positions.length)];
-                        pieces[randomPostion.getY()][randomPostion.getX()] = tempPiece;
-                        pieces[tempPiece.getPosition().getY()][tempPiece.getPosition().getX()] = null;
-                        tempPiece.setPosition(randomPostion);
-                        this.board.turn = this.board.turn === 'white' ? 'black' : 'white';
-                        break outerLoop;
-                    }
-                }
-            }
-            return pieces;
-        }
+    
 
-        public getScore(fENArray: String) :Number
+        public getScore(fENArray: String) :number
         {
             let score: number = 0;
             
@@ -129,11 +109,99 @@ class ArtificialPlayer
             return score;
         }
 
-        public minmax(pieces: (Piece | null)[][]): number
+        public miniMax(pieces: (Piece | null)[][], depth: number, maximazingPlayer: boolean): number
         {
-            
-            return 0;
+            let bestMove: Position = new Position(0,0);
+            let bestToMovePiece: Piece| null = null;
+            if(depth === 0)
+            {
+                this.move(pieces, bestToMovePiece, bestMove);
+                return this.getScore(this.piecesArrayToFEN(pieces));
+
+            }
+
+            if(maximazingPlayer)
+            {
+                let maxEval: number = -Infinity;
+                for (let i = 0; i < 8; i++) 
+                    {
+                        for (let j = 0; j < 8; j++) 
+                        {
+                            const piece = pieces[i][j];
+                            if(piece&&piece.color == this.color)
+                            {
+                                    for(let x = 0; x<piece.moves.length; x++)
+                                    {
+                                        let nextGen :(Piece | null)[][] = this.board.copyBoard(pieces);
+                                        nextGen = this.move(nextGen, piece, piece.moves()[x]);
+                                        let eval = this.miniMax(nextGen,depth-1,false);
+                                    }        
+                            }
+                            
+                        }
+                    }
+            }
+
+            if(!maximazingPlayer)
+                {
+                    let minEval: number = Infinity;
+                    for (let i = 0; i < 8; i++) 
+                        {
+                            for (let j = 0; j < 8; j++) 
+                            {
+                                const piece = pieces[i][j];
+                                if(piece&&piece.color !== this.color)
+                                {
+                                        for(let x = 0; x<piece.moves.length; x++)
+                                        {
+                                            let nextGen :(Piece | null)[][] = this.board.copyBoard(pieces);
+                                            nextGen = this.move(nextGen, piece, piece.moves()[x]);
+                                            let eval = this.miniMax(nextGen,depth-1,true);
+                                            minEval = (eval < minEval) ? eval : minEval;
+                                        }        
+                                }
+                                
+                            }
+                        }
+                }
+                
         }
+
+        public makeBestMove()
+        {
+            let bestMove: number = -1;
+            let piece: Piece;
+            
+            for (let i = 0; i < 8; i++) 
+            {
+                for (let j = 0; j < 8; j++) 
+                {
+                    const piece = this.board.pieces[i][j];
+                    if(piece&&piece.color == this.color)
+                    {
+                        
+                            for(let x = 0; x<piece.moves.length; x++)
+                            {
+
+                            }
+                        
+                    }
+                    
+                }
+            }
+        }
+
+        public move(pieces: (Piece | null)[][], piece: Piece, position: Position): (Piece | null)[][]
+        {               
+            pieces[position.getY()][position.getX()] = piece;
+            pieces[piece.getPosition().getY()][piece.getPosition().getX()] = null;
+            piece.setPosition(position);
+            return pieces;
+        }
+
+
+
+
 
 
         
