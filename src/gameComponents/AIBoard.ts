@@ -99,14 +99,14 @@ class AIBoard extends Board
                     } 
                     else 
                     {
-                        console.log("Nie Twoja tura!");
+                        this.pieces = this.artificialPlayer.makeBestMove(this.pieces);
+                        this.turn = 'white';
                     }
                 }
             }
         }
         
         p.redraw();
-        console.log("Score: " + this.artificialPlayer.getScore(this.artificialPlayer.piecesArrayToFEN(this.pieces)));
     }
 }
 
