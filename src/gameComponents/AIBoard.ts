@@ -83,7 +83,6 @@ class AIBoard extends Board
                             {
                                 this.turn = this.turn === 'white' ? 'black' : 'white';
                                 this.pressedPiece = null;
-                                this.pieces = this.artificialPlayer.move(this.pieces);
                                 return; 
                             }
                     }

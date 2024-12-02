@@ -19452,24 +19452,6 @@ class ArtificialPlayer {
     }
     return output;
   }
-  move(pieces) {
-    outerLoop:
-      while (true) {
-        let tempPiece = pieces[Math.floor(Math.random() * 8)][Math.floor(Math.random() * 8)];
-        if (tempPiece && tempPiece.color === this.color) {
-          let positions = tempPiece.moves();
-          if (positions.length > 0) {
-            let randomPostion = positions[Math.floor(Math.random() * positions.length)];
-            pieces[randomPostion.getY()][randomPostion.getX()] = tempPiece;
-            pieces[tempPiece.getPosition().getY()][tempPiece.getPosition().getX()] = null;
-            tempPiece.setPosition(randomPostion);
-            this.board.turn = this.board.turn === "white" ? "black" : "white";
-            break outerLoop;
-          }
-        }
-      }
-    return pieces;
-  }
   getScore(fENArray) {
     let score = 0;
     for (const char of fENArray) {
@@ -19478,6 +19460,81 @@ class ArtificialPlayer {
       }
     }
     return score;
+  }
+  miniMax(pieces, depth, maximizingPlayer) {
+    if (depth === 0) {
+      const score = this.getScore(this.piecesArrayToFEN(pieces));
+      return { score };
+    }
+    if (maximizingPlayer) {
+      let maxEval = -Infinity;
+      for (let i = 0;i < 8; i++) {
+        for (let j = 0;j < 8; j++) {
+          const piece = pieces[i][j];
+          if (piece && piece.color === this.color) {
+            const legalMoves = piece.moves();
+            for (const move of legalMoves) {
+              const nextGen = this.move(this.board.copyBoard(pieces), piece, move);
+              const evaluation = this.miniMax(nextGen, depth - 1, false).score;
+              maxEval = Math.max(maxEval, evaluation);
+            }
+          }
+        }
+      }
+      return { score: maxEval };
+    } else {
+      let minEval = Infinity;
+      for (let i = 0;i < 8; i++) {
+        for (let j = 0;j < 8; j++) {
+          const piece = pieces[i][j];
+          if (piece && piece.color !== this.color) {
+            const legalMoves = piece.moves();
+            for (const move of legalMoves) {
+              const nextGen = this.move(this.board.copyBoard(pieces), piece, move);
+              const evaluation = this.miniMax(nextGen, depth - 1, true).score;
+              minEval = Math.min(minEval, evaluation);
+            }
+          }
+        }
+      }
+      return { score: minEval };
+    }
+  }
+  makeBestMove() {
+    let bestEval = -Infinity;
+    let bestPiece = null;
+    let bestPosition = null;
+    for (let i = 0;i < 8; i++) {
+      for (let j = 0;j < 8; j++) {
+        const piece = this.board.pieces[i][j];
+        if (piece && piece.color === this.color) {
+          const legalMoves = piece.moves();
+          for (const move of legalMoves) {
+            const nextGen = this.move(this.board.copyBoard(this.board.pieces), piece, move);
+            const evaluation = this.miniMax(nextGen, 3, false).score;
+            if (evaluation > bestEval) {
+              bestEval = evaluation;
+              bestPiece = piece;
+              bestPosition = move;
+            }
+          }
+        }
+      }
+    }
+    if (bestPiece && bestPosition) {
+      console.log(`Komputer poruszy\u0142: ${bestPiece.constructor.name} na ${bestPosition.getX()},${bestPosition.getY()}`);
+    } else {
+      console.log("Brak mo\u017Cliwych ruch\xF3w dla komputera.");
+    }
+  }
+  move(pieces, piece, position) {
+    const newPieces = this.board.copyBoard(pieces);
+    const oldX = piece.getPosition().getX();
+    const oldY = piece.getPosition().getY();
+    newPieces[position.getY()][position.getX()] = piece;
+    newPieces[oldY][oldX] = null;
+    piece.setPosition(position);
+    return newPieces;
   }
 }
 var ArtificialPlayer_default = ArtificialPlayer;
@@ -19528,7 +19585,7 @@ class AIBoard extends Board_default {
             } else {
               this.turn = this.turn === "white" ? "black" : "white";
               this.pressedPiece = null;
-              this.pieces = this.artificialPlayer.move(this.pieces);
+              this.artificialPlayer.makeBestMove();
               return;
             }
           }

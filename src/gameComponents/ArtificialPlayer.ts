@@ -15,28 +15,22 @@ class ArtificialPlayer
 
     board: Board;
 
-    whiteScore: number;
-
-    blackScore: number;
-
     pieceValues: Record<string, number> = {
         'P': 10,  // pionek biały
-        'p': -10,  // pionek czarny
+        'p': 10,  // pionek czarny
         'N': 30,  // skoczek biały
-        'n': -30,  // skoczek czarny
+        'n': 30,  // skoczek czarny
         'B': 30,  // goniec biały
-        'b': -30,  // goniec czarny
+        'b': 30,  // goniec czarny
         'R': 50,  // wieża biała
-        'r': -50,  // wieża czarna
+        'r': 50,  // wieża czarna
         'Q': 90,  // hetman biały
-        'q': -90,  // hetman czarny
+        'q': 90,  // hetman czarny
         'K': 0,  // król biały
         'k': 0   // król czarny
     };
     constructor(color: string, board: Board)
     {
-        this.whiteScore =0;
-        this.blackScore =0;
         this.color = color;
         this.board = board;
     }
@@ -92,7 +86,96 @@ class ArtificialPlayer
         Position(kolumna,rząd);
         board[rzad][kolumna];
         */
+
+
+        public miniMax(pieces: (Piece | null)[][], depth: number, maximizingPlayer: boolean) :number
+        {
+
+            if(depth == 0)
+            {
+                return this.getScore(this.piecesArrayToFEN(pieces));
+            }
+
+            if(maximizingPlayer)
+            {
+                let maxEval: number = -Infinity
+
+                for (let i = 0; i < 8; i++) 
+                {
+                    for (let j = 0; j < 8; j++) 
+                    {
+                        let piece = pieces[i][j];
+                        if(piece !== null && piece.color === this.color)
+                        {
+                           
+                            if(piece.moves().length > 0)
+                            {
+                                for(let position of piece.moves())
+                                {
+                                    let nextGen: (Piece | null)[][] = this.copyBoard(pieces);
+                                    nextGen = this.move(nextGen, piece.position, position);
+                                    let evaluation = this.miniMax(nextGen,depth-1,false);
+                                    maxEval = this.max(maxEval, evaluation);
+                                }
+                            }
+                        }
+                    }
+                }
+                return maxEval;
+            }
+
+            if(!maximizingPlayer)
+                {
+                    let minEval: number = Infinity
     
+                    for (let i = 0; i < 8; i++) 
+                    {
+                        for (let j = 0; j < 8; j++) 
+                        {
+                            let piece = pieces[i][j];
+                            if(piece !== null && piece.color !== this.color)
+                            {
+                               
+                                if(piece.moves().length > 0)
+                                {
+                                    for(let position of piece.moves())
+                                    {
+                                        let nextGen: (Piece | null)[][] = this.copyBoard(pieces);
+                                        nextGen = this.move(nextGen, piece.position, position);
+                                        let evaluation = this.miniMax(nextGen,depth-1,true);
+                                        minEval = this.max(minEval, evaluation);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return minEval;
+                }
+
+                return 0;
+        }
+
+        public makeBestMove(pieces: (Piece | null)[][])
+        {
+           
+        
+        }
+
+        public move(pieces: (Piece | null)[][], from: Position, to: Position): (Piece | null)[][] 
+        {
+            const newBoard = this.copyBoard(pieces); 
+
+            const pieceToMove = newBoard[from.getY()][from.getX()]; 
+            newBoard[to.getY()][to.getX()] = pieceToMove; 
+            newBoard[from.getY()][from.getX()] = null; 
+
+            if (pieceToMove) {
+                pieceToMove.setPosition(to); 
+            }
+
+            return newBoard; 
+        }
+
 
         public getScore(fENArray: String) :number
         {
@@ -109,103 +192,43 @@ class ArtificialPlayer
             return score;
         }
 
-        public miniMax(pieces: (Piece | null)[][], depth: number, maximazingPlayer: boolean): number
+        public copyBoard(board: (Piece | null)[][]): (Piece | null)[][] {
+            return board.map(row =>
+                row.map(piece => piece ? Object.assign(Object.create(Object.getPrototypeOf(piece)), piece) : null)
+            );
+        }
+
+        public max(n1: number, n2: number)
         {
-            let bestMove: Position = new Position(0,0);
-            let bestToMovePiece: Piece| null = null;
-            if(depth === 0)
+            if(n1 > n2)
             {
-                this.move(pieces, bestToMovePiece, bestMove);
-                return this.getScore(this.piecesArrayToFEN(pieces));
-
+                return n1;
             }
-
-            if(maximazingPlayer)
+            if(n1 < n2)
             {
-                let maxEval: number = -Infinity;
-                for (let i = 0; i < 8; i++) 
-                    {
-                        for (let j = 0; j < 8; j++) 
-                        {
-                            const piece = pieces[i][j];
-                            if(piece&&piece.color == this.color)
-                            {
-                                    for(let x = 0; x<piece.moves.length; x++)
-                                    {
-                                        let nextGen :(Piece | null)[][] = this.board.copyBoard(pieces);
-                                        nextGen = this.move(nextGen, piece, piece.moves()[x]);
-                                        let eval = this.miniMax(nextGen,depth-1,false);
-                                    }        
-                            }
-                            
-                        }
-                    }
+                return n2;
             }
-
-            if(!maximazingPlayer)
-                {
-                    let minEval: number = Infinity;
-                    for (let i = 0; i < 8; i++) 
-                        {
-                            for (let j = 0; j < 8; j++) 
-                            {
-                                const piece = pieces[i][j];
-                                if(piece&&piece.color !== this.color)
-                                {
-                                        for(let x = 0; x<piece.moves.length; x++)
-                                        {
-                                            let nextGen :(Piece | null)[][] = this.board.copyBoard(pieces);
-                                            nextGen = this.move(nextGen, piece, piece.moves()[x]);
-                                            let eval = this.miniMax(nextGen,depth-1,true);
-                                            minEval = (eval < minEval) ? eval : minEval;
-                                        }        
-                                }
-                                
-                            }
-                        }
-                }
-                
+            else
+            {
+                return n1;
+            }
         }
 
-        public makeBestMove()
+        public min(n1: number, n2: number)
         {
-            let bestMove: number = -1;
-            let piece: Piece;
-            
-            for (let i = 0; i < 8; i++) 
+            if(n1 < n2)
             {
-                for (let j = 0; j < 8; j++) 
-                {
-                    const piece = this.board.pieces[i][j];
-                    if(piece&&piece.color == this.color)
-                    {
-                        
-                            for(let x = 0; x<piece.moves.length; x++)
-                            {
-
-                            }
-                        
-                    }
-                    
-                }
+                return n1;
+            }
+            if(n1 > n2)
+            {
+                return n2;
+            }
+            else
+            {
+                return n1;
             }
         }
-
-        public move(pieces: (Piece | null)[][], piece: Piece, position: Position): (Piece | null)[][]
-        {               
-            pieces[position.getY()][position.getX()] = piece;
-            pieces[piece.getPosition().getY()][piece.getPosition().getX()] = null;
-            piece.setPosition(position);
-            return pieces;
-        }
-
-
-
-
-
-
-        
-
     
 }
 
