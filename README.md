@@ -1,7 +1,7 @@
 Chess Game in TypeScript with p5.js
 🎯 Opis projektu
 ![alt text](image.png)
-To jest projekt gry w szachy, zaimplementowany w TypeScript z użyciem biblioteki graficznej p5.js. Gra umożliwia rozgrywkę dwóch graczy na jednej planszy a także na grę z prostą implementacją AI za pomocą algorytmu miniMax() faworyzującego ruchy które są rozwijające.
+Jest to projekt gry w szachy, zaimplementowany w TypeScript z użyciem biblioteki graficznej p5.js. Gra umożliwia rozgrywkę dwóch graczy na jednej planszy, a także na grę z prostą implementacją AI za pomocą algorytmu miniMax() faworyzującego ruchy które są rozwijające.
 🛠️ Funkcjonalności
 
     Ruchy figur – Obsługa wszystkich reguł ruchów dla każdego typu figury.
