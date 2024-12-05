@@ -19184,6 +19184,17 @@ class King extends Piece_default {
         }
       }
     }
+    if (this.moved == false) {
+      let tempRook = this.board.checkPosition(new Position_default(this.position.getX() + 3, this.position.getY()));
+      if (tempRook !== null && tempRook instanceof Rook_default && tempRook.moved === false && this.board.checkPosition(new Position_default(this.position.getX() + 2, this.position.getY())) === null && this.board.checkPosition(new Position_default(this.position.getX() + 1, this.position.getY())) === null) {
+        positions.push(new Position_default(this.position.getX() + 2, this.position.getY()));
+      }
+      let secondtempRook = this.board.checkPosition(new Position_default(this.position.getX() - 4, this.position.getY()));
+      if (secondtempRook !== null && secondtempRook instanceof Rook_default && secondtempRook.moved === false && this.board.checkPosition(new Position_default(this.position.getX() - 3, this.position.getY())) === null && this.board.checkPosition(new Position_default(this.position.getX() - 2, this.position.getY())) === null && this.board.checkPosition(new Position_default(this.position.getX() - 1, this.position.getY())) === null) {
+        positions.push(new Position_default(this.position.getX() - 2, this.position.getY()));
+        console.log("add left side castling");
+      }
+    }
     return positions;
   }
   draw(p) {
@@ -19208,9 +19219,13 @@ var King_default = King;
 
 // src/gameComponents/Board.ts
 class Board {
+  width = 1000;
+  height = 1000;
   pieces;
+  winner = "nobody";
   turn = "white";
   pressedPiece = null;
+  showModal = false;
   draw(p, tileSize) {
     for (let i = 0;i < 8; i++) {
       for (let j = 0;j < 8; j++) {
@@ -19257,6 +19272,18 @@ class Board {
         p.square(positions[i].getX() * tileSize + 50, positions[i].getY() * tileSize + 50, tileSize);
       }
     }
+    if (this.showModal) {
+      p.fill(0, 0, 0, 200);
+      p.rect(100, 100, this.width - 200, this.height - 200, 20);
+      p.fill(255);
+      p.textSize(32);
+      p.text(this.winner + " Wygra\u0142!", this.width / 2, this.height / 2 - 50);
+      p.fill(100, 200, 100);
+      p.rect(this.width / 2 - 50, this.height / 2 + 50, 100, 50, 10);
+      p.fill(255);
+      p.textSize(24);
+      p.text("OK", this.width / 2, this.height / 2 + 75);
+    }
   }
   update(p) {
   }
@@ -19269,27 +19296,47 @@ class Board {
         const possibleMoves = this.pressedPiece.moves();
         for (let move of possibleMoves) {
           if (tempPosition.getX() === move.getX() && tempPosition.getY() === move.getY()) {
-            const intialPosition = this.pressedPiece.getPosition();
+            const initialPosition = this.pressedPiece.getPosition();
             const tempPositionPiece = this.pieces[tempPosition.getY()][tempPosition.getX()];
-            this.pieces[this.pressedPiece.getPosition().getY()][this.pressedPiece.getPosition().getX()] = null;
+            this.pieces[initialPosition.getY()][initialPosition.getX()] = null;
             this.pieces[tempPosition.getY()][tempPosition.getX()] = this.pressedPiece;
             this.pressedPiece.setPosition(tempPosition);
             if (this.pressedPiece instanceof Pawn_default || this.pressedPiece instanceof Rook_default || this.pressedPiece instanceof King_default) {
               this.pressedPiece.moved = true;
             }
-            if (this.isKingOnTarget() === true) {
-              console.log("kr\xF3l na celowniku");
-              this.pieces[intialPosition.getY()][intialPosition.getX()] = this.pressedPiece;
-              this.pressedPiece.setPosition(intialPosition);
+            if (this.pressedPiece instanceof King_default) {
+              const kingInitialX = initialPosition.getX();
+              if (tempPosition.getX() === kingInitialX + 2) {
+                const rook = this.pieces[initialPosition.getY()][kingInitialX + 3];
+                if (rook instanceof Rook_default) {
+                  this.pieces[initialPosition.getY()][kingInitialX + 3] = null;
+                  this.pieces[initialPosition.getY()][kingInitialX + 1] = rook;
+                  rook.setPosition(new Position_default(kingInitialX + 1, initialPosition.getY()));
+                }
+              } else if (tempPosition.getX() === kingInitialX - 2) {
+                const rook = this.pieces[initialPosition.getY()][kingInitialX - 4];
+                if (rook instanceof Rook_default) {
+                  this.pieces[initialPosition.getY()][kingInitialX - 4] = null;
+                  this.pieces[initialPosition.getY()][kingInitialX - 1] = rook;
+                  rook.setPosition(new Position_default(kingInitialX - 1, initialPosition.getY()));
+                }
+              }
+            }
+            if (this.isKingOnTarget()) {
+              console.log("Kr\xF3l na celowniku");
+              this.pieces[initialPosition.getY()][initialPosition.getX()] = this.pressedPiece;
+              this.pressedPiece.setPosition(initialPosition);
               if (tempPositionPiece) {
                 this.pieces[tempPosition.getY()][tempPosition.getX()] = tempPositionPiece;
-                break;
               } else {
                 this.pieces[tempPosition.getY()][tempPosition.getX()] = null;
               }
             } else {
               this.turn = this.turn === "white" ? "black" : "white";
               this.pressedPiece = null;
+              if (this.isCheckmate(this.turn === "white" ? "black" : "white")) {
+                this.winner = this.turn === "white" ? "white" : "black";
+              }
               return;
             }
           }
@@ -19304,6 +19351,14 @@ class Board {
             console.log("Nie Twoja tura!");
           }
         }
+      }
+    }
+    if (this.showModal) {
+      const buttonX = this.width / 2 - 50;
+      const buttonY = this.height / 2 + 50;
+      if (p.mouseX > buttonX && p.mouseX < buttonX + 100 && p.mouseY > buttonY && p.mouseY < buttonY + 50) {
+        this.showModal = false;
+        location.reload();
       }
     }
     p.redraw();
@@ -19367,6 +19422,64 @@ class Board {
       }
     }
     return false;
+  }
+  isCheckmate(color2) {
+    let king = null;
+    console.log("sprawdzenie szachu");
+    for (let row = 0;row < 8; row++) {
+      for (let col = 0;col < 8; col++) {
+        const piece = this.pieces[row][col];
+        if (piece instanceof King_default && piece.color === color2) {
+          king = piece;
+          break;
+        }
+      }
+    }
+    if (!king) {
+      console.log(`Nie znaleziono kr\xF3la ${color2}`);
+      return false;
+    }
+    if (!this.isKingOnTarget()) {
+      return false;
+    }
+    const possibleMoves = king.moves();
+    for (let move of possibleMoves) {
+      const tempPosition = king.getPosition();
+      const targetPiece = this.pieces[move.getY()][move.getX()];
+      this.pieces[tempPosition.getY()][tempPosition.getX()] = null;
+      this.pieces[move.getY()][move.getX()] = king;
+      king.setPosition(move);
+      const isStillInCheck = this.isKingOnTarget();
+      king.setPosition(tempPosition);
+      this.pieces[tempPosition.getY()][tempPosition.getX()] = king;
+      this.pieces[move.getY()][move.getX()] = targetPiece;
+      if (!isStillInCheck) {
+        return false;
+      }
+    }
+    for (let row = 0;row < 8; row++) {
+      for (let col = 0;col < 8; col++) {
+        const piece = this.pieces[row][col];
+        if (piece && piece.color === color2 && !(piece instanceof King_default)) {
+          const moves = piece.moves();
+          for (let move of moves) {
+            const tempPosition = piece.getPosition();
+            const targetPiece = this.pieces[move.getY()][move.getX()];
+            this.pieces[tempPosition.getY()][tempPosition.getX()] = null;
+            this.pieces[move.getY()][move.getX()] = piece;
+            piece.setPosition(move);
+            const isStillInCheck = this.isKingOnTarget();
+            piece.setPosition(tempPosition);
+            this.pieces[tempPosition.getY()][tempPosition.getX()] = piece;
+            this.pieces[move.getY()][move.getX()] = targetPiece;
+            if (!isStillInCheck) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+    return true;
   }
   constructor(pieces) {
     this.pieces = Array.from({ length: 8 }, () => Array(8).fill(null));

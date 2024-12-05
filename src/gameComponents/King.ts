@@ -1,6 +1,7 @@
 import Board from "./Board";
 import Piece from "./Piece";
 import Position from "./Position";
+import Rook from "./Rook";
 
 class King extends Piece
 {
@@ -48,6 +49,22 @@ class King extends Piece
                         positions.push(newPosition);
                     }
             }
+    }
+
+    if(this.moved == false)
+    {  
+        let tempRook = this.board.checkPosition(new Position(this.position.getX() + 3, this.position.getY()));
+        if(tempRook !== null && tempRook instanceof Rook && tempRook.moved === false && this.board.checkPosition(new Position(this.position.getX() + 2, this.position.getY())) === null && this.board.checkPosition(new Position(this.position.getX() + 1, this.position.getY())) === null)
+        {
+            positions.push(new Position(this.position.getX() +2,this.position.getY()))
+        }
+        
+        let secondtempRook = this.board.checkPosition(new Position(this.position.getX() -4, this.position.getY()));
+        if(secondtempRook !== null && secondtempRook instanceof Rook && secondtempRook.moved === false && this.board.checkPosition(new Position(this.position.getX() -3, this.position.getY())) === null && this.board.checkPosition(new Position(this.position.getX() -2, this.position.getY())) === null && this.board.checkPosition(new Position(this.position.getX() -1, this.position.getY())) === null)
+        {
+            positions.push(new Position(this.position.getX() -2,this.position.getY()))
+            console.log("add left side castling");
+        }
     }
     return positions;
 }
